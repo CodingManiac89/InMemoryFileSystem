@@ -11,7 +11,7 @@ public class FileSystemService {
 		FileSystemDS ds = new FileSystemDS();
 		FileSystemEntry subfolder = new Directory();
 		subfolder.setName("subfolder");
-		ds.createFile("/root/subfolder", subfolder);
+		ds.createFile("/root", subfolder);
 		System.out.println(ds.currentDirectory().getName());
 		
 		FileSystemEntry file = new File();
@@ -34,6 +34,18 @@ public class FileSystemService {
 		folder2.setName("subfolder2");
 		ds.createFile("root/subfolder", folder2);
 		
+		FileSystemEntry folder3 = new Directory();
+		folder3.setName("subfolder3");
+		ds.createFile("root/subfolder", folder3);
+		
+		FileSystemEntry folder4 = new Directory();
+		folder4.setName("subfolder4");
+		ds.createFile("root/subfolder", folder4);
+		
+		FileSystemEntry folder5 = new Directory();
+		folder5.setName("subfolder5");
+		ds.createFile("root/subfolder", folder5);
+		
 		FileSystemEntry nestedFile = new File();
 		nestedFile.setName("f4");
 		((File)nestedFile).setContent("This is internal file");
@@ -41,6 +53,10 @@ public class FileSystemService {
 		
 		System.out.println(ds.getAllFilesInFolder("subfolder").stream().map(File::getName).collect(Collectors.toList()));
 		System.out.println(ds.getAllFilesInFolderRecursively("subfolder").stream().map(File::getName).collect(Collectors.toList()));
+		
+		System.out.println(ds.SearchFilesByPrefix("subfolder", "sub"));
+		
+		System.out.println(ds.changeDirectory("subfolder5"));
 		
 	}
 }

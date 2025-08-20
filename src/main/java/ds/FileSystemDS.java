@@ -13,6 +13,7 @@ public class FileSystemDS {
 	Map<Integer,FileSystemEntry> pathObjMap = new HashMap<>();
 	ThreadLocal<Integer> currentEntryId = ThreadLocal.withInitial(()->0);
 	Map<String,FileSystem> entryDSMap = new HashMap<>();
+	FileSearchService searchService = new FileSearchService();
 	
 	public FileSystemDS() {
 		this.fileSystem = new FileSystem();
@@ -58,6 +59,7 @@ public class FileSystemDS {
 			changeDirectory(entry.getName());
 			entryDSMap.put(entry.getName(), node);
 		}
+		searchService.addFile(pathTokens[pathTokens.length-1], entry.getName());
 	}
 	
 	public FileSystemEntry changeDirectory(String name) {
@@ -107,7 +109,10 @@ public class FileSystemDS {
 		return files;
 		
 	}
-		
+	
+	public List<String> SearchFilesByPrefix(String folderName, String prefix){
+		return searchService.getAllEntriesByPrefixInFolder(folderName, prefix);
+	}
 	
 	
 	
