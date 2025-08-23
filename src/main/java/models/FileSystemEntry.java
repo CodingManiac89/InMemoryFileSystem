@@ -11,6 +11,7 @@ public abstract class FileSystemEntry {
 	private String name;
 	private Date createdOn;
 	private Date modifiedOn;
+	private String path;
 	
 	public FileSystemEntry() {
 		this.createdOn = new Date();
@@ -50,6 +51,15 @@ public abstract class FileSystemEntry {
 	public void setType(EntryType type) {
 		this.type = type;
 	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+	
 	
 	
 

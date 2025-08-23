@@ -1,6 +1,9 @@
 package ds;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import constants.EntryType;
 import models.Directory;
@@ -20,6 +23,7 @@ public class FileSystemDS {
 		FileSystemEntry entry = new Directory();
 		entry.setName("root");
 		createFile("/root",entry);
+		currentEntryId.set(entry.getName().hashCode());
 	}
 	
 	private class FileSystem{
@@ -49,6 +53,7 @@ public class FileSystemDS {
 		}
 		
 		FileSystem node = new FileSystem();
+		entry.setPath(path+"/"+entry.getName());
 		node.entry=entry;
 		if(entry instanceof File) {
 			node.type=EntryType.FILE;
@@ -56,7 +61,6 @@ public class FileSystemDS {
 		temp.children.put(entry.getName(), node);
 		if(node.type==EntryType.DIRECTORY) {
 			pathObjMap.put(entry.hashCode(), entry);
-			changeDirectory(entry.getName());
 			entryDSMap.put(entry.getName(), node);
 		}
 		searchService.addFile(pathTokens[pathTokens.length-1], entry.getName());
@@ -110,11 +114,26 @@ public class FileSystemDS {
 		
 	}
 	
-	public List<String> SearchFilesByPrefix(String folderName, String prefix){
+	public List<FileSystemEntry> getAllEntriesRecursively(String folderName){
+		FileSystem node = entryDSMap.get(folderName);
+		return getAllEntries(node,new ArrayList<FileSystemEntry>());
+	}
+	
+	private List<FileSystemEntry> getAllEntries(FileSystem node, ArrayList<FileSystemEntry> entries) {
+		for(FileSystem child:node.children.values()) {
+			entries.add(child.entry);
+			getAllEntries(child,entries);
+		}
+		return entries;
+	}
+
+	public List<String> searchFilesByPrefix(String folderName, String prefix){
 		return searchService.getAllEntriesByPrefixInFolder(folderName, prefix);
 	}
 	
-	
+	public void moveEntries(Directory source, Directory target, FileSystemEntry entry) {
+		
+	}
 	
 	
 	

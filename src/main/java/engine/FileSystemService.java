@@ -54,9 +54,11 @@ public class FileSystemService {
 		System.out.println(ds.getAllFilesInFolder("subfolder").stream().map(File::getName).collect(Collectors.toList()));
 		System.out.println(ds.getAllFilesInFolderRecursively("subfolder").stream().map(File::getName).collect(Collectors.toList()));
 		
-		System.out.println(ds.SearchFilesByPrefix("subfolder", "sub"));
+		System.out.println(ds.searchFilesByPrefix("subfolder", "sub"));
 		
 		System.out.println(ds.changeDirectory("subfolder5"));
+		
+		System.out.println(ds.getAllEntriesRecursively("root").stream().map(FileSystemEntry::getPath).collect(Collectors.toList()));
 		
 	}
 }

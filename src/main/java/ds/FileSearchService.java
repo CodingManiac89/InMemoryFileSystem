@@ -42,21 +42,19 @@ public class FileSearchService {
 		}
 		EntryNamePrefix entryNameTree = findFileMap.get(folder);
 		List<String> fileNames = new ArrayList<>();
-		return findEntries(getSuffixNode(prefix, entryNameTree), fileNames, prefix, prefix);
+		StringBuilder prefixBuilder = new StringBuilder(prefix);
+		return findEntries(getSuffixNode(prefix, entryNameTree), fileNames, prefixBuilder);
 	}
 
-	private List<String> findEntries(EntryNamePrefix entryNameTree, List<String> fileNames, String prefix, String entryName) {	
+	private List<String> findEntries(EntryNamePrefix entryNameTree, List<String> fileNames, StringBuilder prefix) {	
 		for(char c:entryNameTree.children.keySet()) {
-			if(entryNameTree.children.get(c).isWord) {
-				entryName=entryName+c;
-				fileNames.add(entryName);
-				entryName=prefix;
+			EntryNamePrefix node = entryNameTree.children.get(c);
+			prefix.append(c);
+			if(node.isWord) {
+				fileNames.add(prefix.toString());
 			}
-			else {
-				prefix = entryName+c;
-				entryNameTree = entryNameTree.children.get(c);
-				findEntries(entryNameTree,fileNames,prefix,prefix);
-			}
+			findEntries(node,fileNames,prefix);
+			prefix.deleteCharAt(prefix.length()-1);
 		}
 		return fileNames;
 		
