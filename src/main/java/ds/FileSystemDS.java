@@ -21,8 +21,8 @@ public class FileSystemDS {
 		this.fileSystem = new FileSystem();
 		FileSystemEntry entry = new Directory();
 		entry.setName("root");
-		createFile("/",entry);
-		currentEntryId.set("//"+entry.getName());
+		createFile("",entry);
+		currentEntryId.set("/"+entry.getName());
 	}
 	
 	public void createFile(String path, FileSystemEntry entry) {

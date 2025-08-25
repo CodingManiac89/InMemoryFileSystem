@@ -35,7 +35,7 @@ public class FileSystemCreationTest {
 		FileSystemEntry file = new File();
 		file.setName("f.txt");
 		ds.createFile("root", file);
-		assertEquals(1,ds.getAllFilesInFolder("//root").size());
+		assertEquals(1,ds.getAllFilesInFolder("/root").size());
 	}
 	
 	

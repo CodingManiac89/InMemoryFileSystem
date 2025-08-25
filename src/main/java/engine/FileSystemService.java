@@ -59,7 +59,7 @@ public class FileSystemService {
 		
 		System.out.println(ds.changeDirectory("root/subfolder/subfolder5"));
 		
-		System.out.println(ds.getAllEntriesRecursively("//root").stream().map(FileSystemEntry::getPath).collect(Collectors.toList()));
+		System.out.println(ds.getAllEntriesRecursively("/root").stream().map(FileSystemEntry::getPath).collect(Collectors.toList()));
 		
 	}
 }
