@@ -13,8 +13,7 @@ import models.FileSystemEntry;
 public class FileSystemDS {
 	
 	FileSystem fileSystem;
-	Map<Integer,FileSystemEntry> pathObjMap = new HashMap<>();
-	ThreadLocal<Integer> currentEntryId = ThreadLocal.withInitial(()->0);
+	ThreadLocal<String> currentEntryId = ThreadLocal.withInitial(()->"");
 	Map<String,FileSystem> entryDSMap = new HashMap<>();
 	FileSearchService searchService = new FileSearchService();
 	
@@ -22,22 +21,9 @@ public class FileSystemDS {
 		this.fileSystem = new FileSystem();
 		FileSystemEntry entry = new Directory();
 		entry.setName("root");
-		createFile("/root",entry);
-		currentEntryId.set(entry.getName().hashCode());
+		createFile("/",entry);
+		currentEntryId.set("//"+entry.getName());
 	}
-	
-	private class FileSystem{
-		private Map<String,FileSystem> children = new HashMap<>();
-		private FileSystemEntry entry;
-		private EntryType type = EntryType.DIRECTORY;
-		@Override
-		public String toString() {
-			return "FileSystem [children=" + children + ", entry=" + entry + ", type=" + type + "]";
-		}
-		
-		
-	}
-	
 	
 	public void createFile(String path, FileSystemEntry entry) {
 		FileSystem temp = this.fileSystem;
@@ -53,6 +39,7 @@ public class FileSystemDS {
 		}
 		
 		FileSystem node = new FileSystem();
+		node.parent=temp;
 		entry.setPath(path+"/"+entry.getName());
 		node.entry=entry;
 		if(entry instanceof File) {
@@ -60,26 +47,25 @@ public class FileSystemDS {
 		}
 		temp.children.put(entry.getName(), node);
 		if(node.type==EntryType.DIRECTORY) {
-			pathObjMap.put(entry.hashCode(), entry);
-			entryDSMap.put(entry.getName(), node);
+			entryDSMap.put(path+"/"+entry.getName(), node);
 		}
-		searchService.addFile(pathTokens[pathTokens.length-1], entry.getName());
+		searchService.addFile(path, entry.getName());
 	}
 	
-	public FileSystemEntry changeDirectory(String name) {
-		if(pathObjMap.get(name.hashCode())==null) {
+	public FileSystem changeDirectory(String name) {
+		if(entryDSMap.get(name)==null) {
 			System.out.println("No such file or directory exisits");
 			return null;
 		}
 		else {
-			currentEntryId.set(name.hashCode());
-			return pathObjMap.get(name.hashCode());
+			currentEntryId.set(name);
+			return entryDSMap.get(name);
 		}
 		
 	}
 	
-	public FileSystemEntry currentDirectory() {
-		return pathObjMap.get(currentEntryId.get());
+	public FileSystem currentDirectory() {
+		return entryDSMap.get(currentEntryId.get());
 	}
 	
    
@@ -131,13 +117,59 @@ public class FileSystemDS {
 		return searchService.getAllEntriesByPrefixInFolder(folderName, prefix);
 	}
 	
-	public void moveEntries(Directory source, Directory target, FileSystemEntry entry) {
-		
+	public void deleteEntry(String entryName) {
+		if(entryDSMap.get(entryName)==null) {
+			System.out.println("No such entry exists");
+			return;
+		}
+		else {
+			FileSystem node = entryDSMap.get(entryName);
+			FileSystem parent = node.parent;
+			parent.children.remove(entryName);
+			removeAllChildrenFromMap(node);
+			entryDSMap.remove(entryName);
+		}
 	}
 	
+	private void removeAllChildrenFromMap(FileSystem node) {
+		for(FileSystem child:node.children.values()) {
+			entryDSMap.remove(child.entry.getPath());
+			searchService.removeFile(child.entry.getPath());
+			removeAllChildrenFromMap(child);
+		}	
+	}
+
+	public void move(String dest, String source) {
+		if(entryDSMap.get(source)==null) {
+			System.out.println("No such entry exists");
+			return;
+		}
+		if(entryDSMap.get(dest)==null) {
+			System.out.println("No such destination exists");
+			return;
+		}
+		
+		FileSystem node = entryDSMap.get(source);
+		node.parent.children.remove(source);
+		
+		FileSystem destNode = entryDSMap.get(dest);
+		
+		node.parent=destNode;
+		entryDSMap.remove(node.entry.getPath());
+		node.entry.setPath(destNode.entry.getPath()+"/"+source.split("/")[source.split("/").length-1]);
+		updatePaths(node);
+		destNode.children.put(source, node);
+		entryDSMap.put(node.entry.getPath(), node);
+	}
 	
-	
+	private void updatePaths(FileSystem node) {
+		for(FileSystem n:node.children.values()) {
+			n.entry.setPath(n.parent.entry.getPath()+"/"+n.entry.getName());
+			updatePaths(n);
+		}
+	}
 }
+
 
 
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ds.FileSystem;
 import ds.FileSystemDS;
 import models.Directory;
 import models.File;
@@ -25,8 +26,8 @@ public class FileSystemCreationTest {
 		FileSystemEntry folder = new Directory();
 		folder.setName("folder1");
 		ds.createFile("root", folder);
-		ds.changeDirectory(folder.getName());
-		assertEquals("folder1", ds.currentDirectory().getName());
+		ds.changeDirectory("root/"+folder.getName());
+		assertEquals("folder1", ds.currentDirectory().getEntry().getName());
 	}
 	
 	@Test
@@ -34,7 +35,7 @@ public class FileSystemCreationTest {
 		FileSystemEntry file = new File();
 		file.setName("f.txt");
 		ds.createFile("root", file);
-		assertEquals(1,ds.getAllFilesInFolder("root").size());
+		assertEquals(1,ds.getAllFilesInFolder("//root").size());
 	}
 	
 	
@@ -43,13 +44,13 @@ public class FileSystemCreationTest {
 		FileSystemEntry folder = new Directory();
 		folder.setName("subfolder");
 		ds.createFile("root", folder);
-		ds.changeDirectory(folder.getName());
-		assertEquals("subfolder", ds.currentDirectory().getName());
+		ds.changeDirectory("root/"+folder.getName());
+		assertEquals("subfolder", ds.currentDirectory().getEntry().getName());
 		
 		FileSystemEntry file = new File();
 		file.setName("f.txt");
 		ds.createFile("root/subfolder", file);
-		assertEquals(1,ds.getAllFilesInFolder("subfolder").size());	
+		assertEquals(1,ds.getAllFilesInFolder("root/subfolder").size());	
 	}
 	
 	@Test
@@ -57,9 +58,23 @@ public class FileSystemCreationTest {
 		FileSystemEntry folder = new Directory();
 		folder.setName("f1");
 		ds.createFile("root", folder);
-		assertEquals("root",ds.currentDirectory().getName());
+		assertEquals("root",ds.currentDirectory().getEntry().getName());
 		
-		ds.changeDirectory("f1");
-		assertEquals("f1",ds.currentDirectory().getName());
+		ds.changeDirectory("root/f1");
+		assertEquals("f1",ds.currentDirectory().getEntry().getName());
+	}
+	
+	@Test
+	public void testParent() {
+		FileSystemEntry folder1 = new Directory();
+		folder1.setName("f1");
+		ds.createFile("root", folder1);
+		FileSystemEntry folder2 = new Directory();
+		folder2.setName("f2");
+		ds.createFile("root/f1",folder2);
+		
+		FileSystem node = ds.changeDirectory("root/f1/f2");
+		assertEquals("f1",node.getParent().getEntry().getName());
+		
 	}
 }

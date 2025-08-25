@@ -73,5 +73,13 @@ public class FileSearchService {
 		return temp;
 	}
 	
+	public void removeFile(String file) {
+		if(findFileMap.get(file)==null) {
+			System.out.println("No such file exists");
+			return;
+		}
+		findFileMap.remove(file);
+	}
+	
 
 }

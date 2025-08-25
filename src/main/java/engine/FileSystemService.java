@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ds.FileSystemDS;
+import ds.FileSystem;
 import models.*;
 
 public class FileSystemService {
@@ -11,14 +12,14 @@ public class FileSystemService {
 		FileSystemDS ds = new FileSystemDS();
 		FileSystemEntry subfolder = new Directory();
 		subfolder.setName("subfolder");
-		ds.createFile("/root", subfolder);
-		System.out.println(ds.currentDirectory().getName());
+		ds.createFile("root", subfolder);
+		System.out.println(ds.currentDirectory().getEntry().getName());
 		
 		FileSystemEntry file = new File();
 		file.setName("f1");
 		((File)file).setContent("This is a text file");
 		ds.createFile("root/subfolder", file);
-		System.out.println(ds.currentDirectory().getName());
+		System.out.println(ds.currentDirectory().getEntry().getName());
 		
 		FileSystemEntry file2 = new File();
 		file2.setName("f2");
@@ -51,14 +52,14 @@ public class FileSystemService {
 		((File)nestedFile).setContent("This is internal file");
 		ds.createFile("root/subfolder/subfolder2", nestedFile);
 		
-		System.out.println(ds.getAllFilesInFolder("subfolder").stream().map(File::getName).collect(Collectors.toList()));
-		System.out.println(ds.getAllFilesInFolderRecursively("subfolder").stream().map(File::getName).collect(Collectors.toList()));
+		System.out.println(ds.getAllFilesInFolder("root/subfolder").stream().map(File::getName).collect(Collectors.toList()));
+		System.out.println(ds.getAllFilesInFolderRecursively("root/subfolder").stream().map(File::getName).collect(Collectors.toList()));
 		
-		System.out.println(ds.searchFilesByPrefix("subfolder", "sub"));
+		System.out.println(ds.searchFilesByPrefix("root/subfolder", "sub"));
 		
-		System.out.println(ds.changeDirectory("subfolder5"));
+		System.out.println(ds.changeDirectory("root/subfolder/subfolder5"));
 		
-		System.out.println(ds.getAllEntriesRecursively("root").stream().map(FileSystemEntry::getPath).collect(Collectors.toList()));
+		System.out.println(ds.getAllEntriesRecursively("//root").stream().map(FileSystemEntry::getPath).collect(Collectors.toList()));
 		
 	}
 }
